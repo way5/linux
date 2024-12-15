@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (c) 2018 BayLibre SAS. All rights reserved.
- */
+* Copyright (c) 2018 BayLibre SAS. All rights reserved.
+*/
 
 /dts-v1/;
 
@@ -15,6 +15,18 @@
 
 	aliases {
 		serial0 = &uart_AO;
+		serial1 = &uart_AO_B;
+		serial2 = &uart_A;
+		serial3 = &uart_B;
+		serial4 = &uart_C;
+		i2c0 = &i2c0;
+		i2c1 = &i2c1;
+		i2c2 = &i2c2;
+		i2c3 = &i2c3;
+		i2c4 = &i2c_AO;
+		spi0 = &spicc0;
+		spi1 = &spicc1;
+		spi2 = &spifc;
 	};
 
 	chosen {
@@ -58,6 +70,14 @@
 		reset-gpios = <&gpio GPIOX_6 GPIO_ACTIVE_LOW>;
 		clocks = <&wifi32k>;
 		clock-names = "ext_clock";
+	};
+
+	typec2_vbus: regulator-typec2_vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "TYPEC2_VBUS";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&ao_5v>;
 	};
 
 	ao_5v: regulator-ao-5v {
@@ -134,21 +154,21 @@
 		model = "RADXA-ZERO";
 		audio-aux-devs = <&tdmout_b>;
 		audio-routing = "TDMOUT_B IN 0", "FRDDR_A OUT 1",
-				"TDMOUT_B IN 1", "FRDDR_B OUT 1",
-				"TDMOUT_B IN 2", "FRDDR_C OUT 1",
-				"TDM_B Playback", "TDMOUT_B OUT";
+		"TDMOUT_B IN 1", "FRDDR_B OUT 1",
+		"TDMOUT_B IN 2", "FRDDR_C OUT 1",
+		"TDM_B Playback", "TDMOUT_B OUT";
 
 		clocks = <&clkc CLKID_MPLL2>,
-			 <&clkc CLKID_MPLL0>,
-			 <&clkc CLKID_MPLL1>;
+		<&clkc CLKID_MPLL0>,
+		<&clkc CLKID_MPLL1>;
 
 		assigned-clocks = <&clkc CLKID_MPLL2>,
-				  <&clkc CLKID_MPLL0>,
-				  <&clkc CLKID_MPLL1>;
+		<&clkc CLKID_MPLL0>,
+		<&clkc CLKID_MPLL1>;
 		assigned-clock-parents = <0>, <0>, <0>;
 		assigned-clock-rates = <294912000>,
-				       <270950400>,
-				       <393216000>;
+		<270950400>,
+		<393216000>;
 
 		dai-link-0 {
 			sound-dai = <&frddr_a>;
@@ -191,6 +211,18 @@
 		#clock-cells = <0>;
 		clock-frequency = <32768>;
 		pwms = <&pwm_ef 0 30518 0>; /* PWM_E at 32.768KHz */
+	};
+};
+
+&ao_pinctrl {
+	/* Ensure the TYPE C controller irq pin is not driven by the SoC */
+	fusb302_irq_pins: fusb302_irq {
+		mux {
+			groups = "GPIOAO_5";
+			function = "gpio_aobus";
+			bias-pull-up;
+			output-disable;
+		};
 	};
 };
 
@@ -268,24 +300,24 @@ left as is for future tests
 */
 /*CHIP0*/
 &gpio {
-    gpio-line-names =
-    /*00*/ "", "", "", "", "", "", "", "", "", "",
-    /*10*/ "", "", "", "", "", "", "", "", "", "",
-    /*20*/ "19 [GPIOH_4]", "21 [GPIOH_5]", "24 [GPIOH_6]", "23 [GPIOH_7]", "36 [GPIOH_8]", "", "", "", "", "",
-    /*30*/ "", "", "", "", "", "", "", "", "", "",
-    /*40*/ "", "", "", "", "", "", "", "", "22 [GPIOC_7]", "",
-    /*50*/ "", "", "", "", "", "", "", "", "", "",
-    /*60*/ "", "", "", "3 [GPIOA_14]", "", "", "", "", "", "",
-    /*70*/ "", "", "", "18 [GPIOX_8]", "12 [GPIOX_9]", "16 [GPIOX_10]", "13 [GPIOX_11]", "", "", "",
-    /*80*/ "", "", "", "", "";
+	gpio-line-names =
+	/*00*/ "", "", "", "", "", "", "", "", "", "",
+	/*10*/ "", "", "", "", "", "", "", "", "", "",
+	/*20*/ "19 [GPIOH_4]", "21 [GPIOH_5]", "24 [GPIOH_6]", "23 [GPIOH_7]", "36 [GPIOH_8]", "", "", "", "", "",
+	/*30*/ "", "", "", "", "", "", "", "", "", "",
+	/*40*/ "", "", "", "", "", "", "", "", "22 [GPIOC_7]", "",
+	/*50*/ "", "", "", "", "", "", "", "", "", "",
+	/*60*/ "", "", "", "3 [GPIOA_14]", "", "", "", "", "", "",
+	/*70*/ "", "", "", "18 [GPIOX_8]", "12 [GPIOX_9]", "16 [GPIOX_10]", "13 [GPIOX_11]", "", "", "",
+	/*80*/ "", "", "", "", "";
 };
 
 /*CHIP1*/
 &gpio_ao {
-    gpio-line-names =
-    /*00*/ "8 [GPIOAO_0]", "10 [GPIOAO_1]", "11,28 [GPIOAO_2]", "7,27 [GPIOAO_3]", "32 [GPIOAO_4]",
-    /*05*/ "5 [GPIOA_15]", "", "", "35 [GPIOAO_8]", "37 [GPIOAO_9]",
-    /*10*/ "", "40 [GPIOAO_11]", "", "", "";
+	gpio-line-names =
+	/*00*/ "8 [GPIOAO_0]", "10 [GPIOAO_1]", "11,28 [GPIOAO_2]", "7,27 [GPIOAO_3]", "32 [GPIOAO_4]",
+	/*05*/ "5 [GPIOA_15]", "", "", "35 [GPIOAO_8]", "37 [GPIOAO_9]",
+	/*10*/ "", "40 [GPIOAO_11]", "", "", "";
 };
 
 &hdmi_tx {
@@ -305,6 +337,42 @@ left as is for future tests
 	status = "disabled";
 	pinctrl-0 = <&remote_input_ao_pins>;
 	pinctrl-names = "default";
+};
+
+&i2c3 {
+	pinctrl-0 = <&i2c3_sda_a_pins>, <&i2c3_sck_a_pins>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	fusb302@22 {
+		compatible = "fcs,fusb302";
+		reg = <0x22>;
+
+		pinctrl-0 = <&fusb302_irq_pins>;
+		pinctrl-names = "default";
+		interrupt-parent = <&gpio_intc>;
+		interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
+
+		vbus-supply = <&typec2_vbus>;
+
+		status = "okay";
+	};
+};
+
+&i2c_AO {
+	fusb302@22 {
+		compatible = "fcs,fusb302";
+		reg = <0x22>;
+
+		pinctrl-0 = <&fusb302_irq_pins>;
+		pinctrl-names = "default";
+		interrupt-parent = <&gpio_intc>;
+		interrupts = <59 IRQ_TYPE_LEVEL_LOW>;
+
+		vbus-supply = <&typec2_vbus>;
+
+		status = "okay";
+	};
 };
 
 &pwm_AO_cd {
@@ -339,8 +407,8 @@ left as is for future tests
 
 	bus-width = <4>;
 	cap-sd-highspeed;
-	sd-uhs-sdr50;
-	max-frequency = <100000000>;
+	cap-mmc-highspeed;
+	max-frequency = <150000000>;
 
 	non-removable;
 	disable-wp;
@@ -430,4 +498,12 @@ left as is for future tests
 
 &usb {
 	status = "okay";
+};
+
+&usb2_phy0 {
+	phy-supply = <&typec2_vbus>;
+};
+
+&usb3_pcie_phy {
+	phy-supply = <&typec2_vbus>;
 };
